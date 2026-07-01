@@ -474,6 +474,13 @@ func updateVideoSingleTask(ctx context.Context, adaptor TaskPollingAdaptor, ch *
 		t := responseItems.Data
 		taskResult.TaskID = t.TaskID
 		taskResult.Status = string(t.Status)
+		// normalize upstream status aliases
+		switch taskResult.Status {
+		case "completed", "done", "succeed":
+			taskResult.Status = string(model.TaskStatusSuccess)
+		case "failed", "error":
+			taskResult.Status = string(model.TaskStatusFailure)
+		}
 		taskResult.Url = t.GetResultURL()
 		taskResult.Progress = t.Progress
 		taskResult.Reason = t.FailReason
